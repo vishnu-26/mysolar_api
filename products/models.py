@@ -47,20 +47,34 @@ class Product:
         self.collection.insert_one(product_document)
 
 
+#    def get_products(self):
+#        try:
+#            cursor = self.collection.find({})
+#
+#            ## Converting pymongo cursor to list of dict
+#            products = list(cursor)
+#
+#            for product in products:
+#                product['image'] = 'http://mysolar.tech/media/'+product['image']
+#        
+#            ## converting list to json 
+#            return loads(dumps(products))
+#        except:
+#            return None
+
+
     def get_products(self):
-        try:
-            cursor = self.collection.find({})
+        cursor = self.collection.find()
+    
+         ## Converting pymongo cursor to list of dict
+        products = list(cursor)
 
-            ## Converting pymongo cursor to list of dict
-            products = list(cursor)
 
-            for product in products:
-                product['image'] = 'http://mysolar.tech/media/'+product['image']
+        for product in products:
+           product['image'] = 'http://localhost:8000/media/'+ product['image']  ##In production change it to 'http://3.20.236.62/media/' + product['image']
         
-            ## converting list to json 
-            return loads(dumps(products))
-        except:
-            return None
+         ## converting list to json 
+        return loads(dumps(products))
         
         
 
