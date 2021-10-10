@@ -144,3 +144,5 @@ cython_debug/
 mysolar_dbdata
 
 pyvenv.cfg
+
+products/models.py
