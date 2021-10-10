@@ -1,3 +1,4 @@
+import os
 import json
 import time
 from django.db import models
@@ -71,10 +72,9 @@ class Product:
 
 
         for product in products:
-           product['image'] = 'http://3.20.236.62/media/'+ product['image']
-         ## converting list to json 
-                 
+           product['image'] = os.getenv('MEDIA_URI') + product['image']
         
+                
         return products      
         
 
