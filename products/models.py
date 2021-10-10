@@ -71,17 +71,11 @@ class Product:
 
 
         for product in products:
-<<<<<<< HEAD
            product['image'] = 'http://3.20.236.62/media/'+ product['image']
          ## converting list to json 
-        return loads(dumps(products))
-=======
-           product['image'] = 'http://localhost:8000/media/'+ product['image']  ##In production change it to 'http://3.20.236.62/media/' + product['image']
+                 
         
-        
-        return products
->>>>>>> d9afcfd340271b1397da0433ae5e02883e571535
-        
+        return products      
         
 
         
