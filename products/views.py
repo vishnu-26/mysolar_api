@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from .models import Product
 from .utils import upload_file
+from rest_framework import viewsets,status,generics,mixins
+from api.pagination import CustomPagination
+from bson.json_util import dumps,loads
 
 # Create your views here.
 
@@ -29,23 +32,32 @@ def upload_product(request):
 
 @api_view(['GET'])
 def products(request):
-    start = time.time()
 
     products = Product().get_products()
-#    print(type(products))
-
-    end=time.time()
-    print(end-start)
+    print(type(products))
 
     if products:
-        return JsonResponse({
-            'Products': products
-        },status=200)
+        paginator = CustomPagination()
+        paginated_data_of_products = paginator.paginate_queryset(products,request)
+
+        paginated_json_data_of_products = loads(dumps(paginated_data_of_products))
+        print(type(paginated_json_data_of_products[0]))
+        return paginator.get_paginated_response(('Products',paginated_json_data_of_products))
 
 
     return JsonResponse({
         'Error': 'Something Went Wrong!!,Please try again'
     },status=501)
+
+
+
+    
+
+
+
+
+
+    
 
 
     
