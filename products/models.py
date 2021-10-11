@@ -58,14 +58,15 @@ class Product:
             for product in products:
                 product['image'] = os.getenv('MEDIA_URI') + product['image']
         
-            ## converting list to json 
+
+            
             return products
         except:
             return None
 
 
 
-        
+
         
 
         
