@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 
 DEFAULT_PAGE=1
-DEFAULT_PAGE_SIZE=5
+DEFAULT_PAGE_SIZE=10
 
 
 class CustomPagination(PageNumberPagination):
