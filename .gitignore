@@ -145,3 +145,9 @@ mysolar_dbdata
 
 pyvenv.cfg
 
+#remove this afterwards
+orders/
+payment/
+templates/
+
+
