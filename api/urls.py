@@ -21,6 +21,7 @@ urlpatterns = [
 
     url(r'^admin/$', admin.site.urls),
     url(r'^api/products/',include('products.urls')),
+    url(r'^api/payment/',include('payment.urls'))
     
     
 ]

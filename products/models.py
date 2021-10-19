@@ -50,8 +50,8 @@ class Product:
 
     def get_products(self):
         try:
-            cursor = self.collection.find({})
-
+            cursor = self.collection.find().sort('_id',1)
+            
             ## Converting pymongo cursor to list of dict
             products = list(cursor)
 
