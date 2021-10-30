@@ -1,0 +1,17 @@
+<html>
+	<head>
+		<title>Redirecting...</title>
+	</head>
+	<body>
+	    <h1>Redirecting to Payment Gateway<h1>
+		<form method="POST" action="{{ payment_url }}" name="form1">
+		{% csrf_token %}
+		{% for key, value in params_dict.items %}
+			<input type="hidden" name="{{key}}" value="{{value}}">
+		{% endfor %}
+			<script type="text/javascript">
+				document.form1.submit()
+			</script>
+		</form>
+	</body>
+</html>
