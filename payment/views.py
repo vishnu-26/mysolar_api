@@ -33,7 +33,6 @@ def payment(request):
 #    print(order_document)
 
 #    order_document={
-#        "_id": _id,
 #        "customer": {
 #            "name":"xyz@",
 #            "email_id":"xyz@gmail.com",
@@ -61,6 +60,7 @@ def payment(request):
 
     o = Order()
     order = o.create(**order_document)
+    print(order)
 #    return JsonResponse({
 #       'order':order
 #    })
