@@ -4,7 +4,10 @@ import time
 import random
 import string
 import requests
-from django.shortcuts import render
+import urllib
+#import urllib2
+import webbrowser
+from django.shortcuts import render,redirect
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
@@ -20,7 +23,7 @@ load_dotenv()
 
 # Create your views here.
 
-
+payment_action = None
 @api_view(['POST'])
 def payment(request):
     order_document= {}
@@ -32,25 +35,14 @@ def payment(request):
 #    order_document['_id']
 #    print(order_document)
 
-#    order_document={
+#    {
 #        "customer": {
 #            "name":"xyz@",
 #            "email_id":"xyz@gmail.com",
 #            "mobile_no":"7777777777"
 #
 #        },
-#        "delivery_address":{
-#            "line1":"abc@",
-#            "line2":"def@",
-#            "pincode":"121",
-#            "city":"Mumbai",
-#            "state":"Maharashtra"
-#
-#        },
-#        "items":[
-#            {"product_id":1,"quantity":2,"amount":600},
-#            {"product_id":2,"quantity":1,"amount":400}
-#        ],
+#        "delivery_address":"dummy",
 #        "total_amount":"1000",
 #        "order_status":"created",
 #        "payment_status":"pending"
@@ -60,7 +52,7 @@ def payment(request):
 
     o = Order()
     order = o.create(**order_document)
-    print(order)
+#    print(order)
 #    return JsonResponse({
 #       'order':order
 #    })
@@ -80,13 +72,62 @@ def payment(request):
 
     params_dict['CHECKSUMHASH'] = checksum.generate_checksum(params_dict, MERCHANT_KEY)
 
-    context = {
-        'company_name': 'My Solar',
-        'payment_url': os.getenv('PAYTM_TXN_URL'),
-        'params_dict': params_dict
-    }
+    
+#    context={
+#        'payment_url': os.getenv('PAYTM_TXN_URL'),
+#        'params_dict': params_dict
+#        
+#    }
 
-    return render(request,'payment/payment.html',context)
+#    return render(request,'payment/payment.html',context)
+
+    payment_url = os.getenv('PAYTM_TXN_URL')
+#    print(os.getenv('PAYTM_CALLBACK_URL'))
+
+    f = open(os.getcwd()+'/templates/payment/payment.html','w')
+    
+    form_fields=""
+    for key,value in params_dict.items():
+        form_fields+="<input type='hidden' name={} value={} >".format(key,value)
+    
+    html="""<html><head><title>Merchant Checkout Page</title></head><body><center><h1>Please do not refresh this page...</h1></center><form method="post" action={} name="f1"> {} </form><script type="text/javascript">document.f1.submit();</script></body></html>"""
+
+
+    html_template = html.format(payment_url,form_fields)
+#    print(html_template)
+    
+    f.write(html_template)
+    f.close()
+    
+
+    webbrowser.open('file://'+os.path.realpath('templates/payment/payment.html'),new=2)
+    
+    while True:
+        order=o.get(**{'_id':order['_id']})
+        
+        if order['transaction_status']!='pending':
+            break
+        time.sleep(5)
+
+    
+    print(order)
+#    post_data = json.dumps(params_dict)
+#    resp = requests.post(payment_url,data=post_data,headers = {"Content-type": "application/json"}).json()
+#    print(resp)
+#
+   
+#
+#    return HttpResponse('<html><head><title>Merchant Checkout Page</title></head><body><center><h1>Please do not refresh this page...</h1></center><form method="post" action="' + payment_url + '" name="f1">' + form_fields + '</form><script type="text/javascript">document.f1.submit();</script></body></html>')
+    
+#    print('Params Dict',params_dict)
+#    print('Payment Url',payment_url)
+    return JsonResponse({
+        'order':order
+    },status=201)
+
+#    resp = requests.post(payment_url,params_dict).text
+#    
+#    print(resp)
 
 
 
@@ -94,11 +135,11 @@ def payment(request):
 @api_view(['POST'])
 def response(request):
     transaction  = verify_payment_response(request)
-    print(transaction)
+#    print(transaction)
 
     order_id = transaction['ORDERID']
     o = Order()
-    
+   
     if transaction['verified']==True:
         o.update(
             {'field_name': '_id' , 'value': order_id},
@@ -110,26 +151,41 @@ def response(request):
                 'field_name': 'payment_status' , 
                 'new_value': 'done'
             
+             },
+             {
+                'field_name': 'transaction_status' , 
+                'new_value': 'success'
              }
             ]
              
         )
-
-    order = o.get(**{'_id': order_id})
+        
+        order = o.get(**{'_id': order_id})
+        
+#        return render(request,'public/index.html')
+        
+    else:
+        o.update(
+            {'field_name': '_id' , 'value': order_id},
+            [{
+                'field_name': 'transaction_status' , 
+                'new_value': 'failed'
+             }]
+             
+        )
+        order = o.get(**{'_id': order_id})
+        
+        
+    
+       
     return JsonResponse({
-        'order': order
+            'order': order
 
-    },status=201)    
+        },status=201)    
     
         
 
-#    o = Order()
-#    if transaction['RESPMSG'] == 'Txn Success':
-#        o.update(
-#            {'field_name': '_id', 'value': transaction['ORDERID']},        
-#            {'field_name': 'status' , 'new_value': 'placed'}
-#        )
-#        return HttpResponse('Done!!')
+
 
 
     
