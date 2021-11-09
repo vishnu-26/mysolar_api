@@ -8,6 +8,7 @@ load_dotenv()
 def connect(db_name="mysolar"):
     try:
         client = pymongo.MongoClient(os.getenv('MONGODB_URI'))
+
         db = client[db_name]
         print('Mongodb Connected: ',db)
         
